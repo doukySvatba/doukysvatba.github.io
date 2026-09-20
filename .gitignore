@@ -1,0 +1,6 @@
+.env
+.env.*
+!.env.example
+_site/
+__pycache__/
+.local/
