@@ -26,3 +26,25 @@ async function restore(){if(!responseId)return;const button=document.querySelect
 attendanceChanged();restore();
 function updateCountdown(){const today=new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Prague',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());const left=Math.max(0,Math.ceil((Date.UTC(2027,5,26)-Date.parse(today+'T00:00:00Z'))/86400000));document.querySelector('#days').textContent=left;document.querySelector('#days-label').textContent=left===0?'Náš svatební den':left===1?'den do našeho ano':left<5?'dny do našeho ano':'dní do našeho ano';}updateCountdown();
 document.querySelector('#calendar').addEventListener('click',()=>{const text=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//DoukySvatba//CS','BEGIN:VEVENT','UID:jiri-katerina-20270626@doukysvatba.github.io','DTSTAMP:'+new Date().toISOString().replace(/[-:]/g,'').replace(/\.\d{3}/,''),'DTSTART;VALUE=DATE:20270626','DTEND;VALUE=DATE:20270627','SUMMARY:Svatba Jiřího a Kateřiny','DESCRIPTION:Svatba v přírodě u rybníka. Přesné místo a časy doplníme.','URL:https://doukysvatba.github.io/','END:VEVENT','END:VCALENDAR',''].join('\r\n');const url=URL.createObjectURL(new Blob([text],{type:'text/calendar;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download='jiri-a-katerina-26-6-2027.ics';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);});
+
+
+// A mail-status lookup never changes the successful database-save acknowledgement.
+const originalShowSuccess=showSuccess;
+showSuccess=function(data){
+  originalShowSuccess(data);
+  const note=document.querySelector('#success .small');
+  if(!note)return;
+  note.textContent=data.email?'Odpověď je uložená. Zjišťujeme stav potvrzovacího e-mailu…':'Odpověď je uložená. Bez e-mailové adresy vám potvrzení e-mailem nepřijde.';
+  if(data.email)weddingApi.rpc('wedding_mail_status',{p_id:responseId}).then(result=>{
+    const messages={sent:'Potvrzení jsme předali poštovnímu serveru. Zkontrolujte doručenou poštu, případně spam.',
+      queued:'Potvrzení je připravené k odeslání na uvedený e-mail. Může dorazit s prodlevou.',
+      sending:'Právě odesíláme potvrzení na uvedený e-mail.',
+      retry:'Odpověď je uložená. Odeslání e-mailu se zpozdilo, automaticky jej zkusíme znovu.',
+      failed:'Odpověď je uložená, ale potvrzovací e-mail se nepodařilo odeslat. Odpověď nemusíte vyplňovat znovu.'};
+    note.textContent=messages[result.status]||'Odpověď je uložená. Pro tuto odpověď zatím není potvrzovací e-mail zařazený k odeslání.';
+  }).catch(()=>{note.textContent='Odpověď je uložená. Stav potvrzovacího e-mailu se teď nepodařilo ověřit.';});
+};
+weddingApi.rpc('wedding_mail_status',{p_id:null}).then(result=>{
+  if(result.enabled){const note=document.querySelector('#email-confirmation-note');
+    if(note)note.textContent='E-mail je nepovinný. Pokud jej vyplníte, po uložení odpovědi vám pošleme potvrzení o přijetí dotazníku. Bez e-mailu potvrzení nepřijde. Stačí uvést telefon.';}
+}).catch(()=>{});

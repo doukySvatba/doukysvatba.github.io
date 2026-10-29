@@ -20,6 +20,9 @@ def deploy():
             crypto=sql.Identifier(namespace)
             cur.execute((ROOT/'supabase.sql').read_text(encoding='utf-8').replace('__CRYPTO__',crypto.as_string(conn)))
             cur.execute(sql.SQL('INSERT INTO wedding_private.settings(singleton,admin_hash) VALUES(true,{c}.crypt(%s,{c}.gen_salt(\'bf\',10))) ON CONFLICT(singleton) DO UPDATE SET admin_hash=excluded.admin_hash').format(c=crypto),(password,))
+            cur.execute("SELECT to_regclass('wedding_private.mail_config')")
+            if cur.fetchone()[0]:
+                cur.execute((ROOT/'email.sql').read_text(encoding='utf-8').replace('__CRYPTO__',crypto.as_string(conn)))
             cur.execute('SELECT public.wedding_status()')
             assert cur.fetchone()[0]['ready']
     print('Wedding database ready. Diploma tables unchanged.')
