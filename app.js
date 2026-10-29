@@ -22,7 +22,34 @@ function payload(){const f=form.elements;return {attendance:f.attendance.value,c
 function showSuccess(data){form.hidden=true;const box=document.querySelector('#success');box.hidden=false;document.querySelector('#success-title').textContent=data.attendance==='yes'?'Těšíme se na vás!':'Děkujeme, že jste dali vědět.';document.querySelector('#success-text').textContent=data.attendance==='yes'?`Zapsali jsme vaši skupinku (${data.guests.length} ${data.guests.length===1?'osoba':data.guests.length<5?'osoby':'osob'}). S jídlem a ostatními potřebami budeme při plánování počítat.`:'Mrzí nás, že se neuvidíme, ale i tak vám posíláme velké díky. Jiří a Kateřina';}
 form.addEventListener('submit',async event=>{event.preventDefault();if(busy)return;const status=document.querySelector('#form-status');status.textContent='';if(!form.reportValidity())return;const data=payload();if(!data.email&&!data.phone){status.textContent='Vyplňte prosím alespoň e-mail nebo telefon.';form.elements.email.focus();return;}if(!data.contactName||data.guests.some(g=>!g.name)){status.textContent='Doplňte prosím jména hostů.';return;}busy=true;const button=document.querySelector('#submit');button.disabled=true;status.textContent='Ukládáme vaši odpověď…';try{if(!responseId){responseId=crypto.randomUUID();try{localStorage.setItem(storageKey,responseId);}catch(_){}}await weddingApi.rpc('wedding_submit',{p_id:responseId,p_payload:data,p_company:form.elements.company.value});showSuccess(data);document.querySelector('#success').focus();status.textContent='';}catch(error){status.textContent=error.message;}finally{busy=false;button.disabled=false;}});
 document.querySelector('#edit-response').addEventListener('click',()=>{document.querySelector('#success').hidden=true;form.hidden=false;form.elements.contactName.focus();});
-async function restore(){if(!responseId)return;const button=document.querySelector('#submit');let failed=false;button.disabled=true;try{const result=await weddingApi.rpc('wedding_resume',{p_id:responseId});if(!result.payload)return;const data=result.payload;for(const key of ['attendance','contactName','email','phone','accommodation','transport','cars','rideHome','accessibility','song','message'])if(form.elements[key])form.elements[key].value=data[key]??'';guestList.replaceChildren();data.guests.forEach(addGuest);attendanceChanged();showSuccess(data);}catch(error){failed=true;document.querySelector('#form-status').textContent='Předchozí odpověď se nepodařilo načíst. Než ji budete upravovat, zkuste stránku obnovit.';}finally{button.disabled=failed;}}
+let restoreBusy=false,formTouched=false;
+form.addEventListener('input',()=>{formTouched=true;});
+form.addEventListener('change',()=>{formTouched=true;});
+const retryRestore=document.createElement('button');
+retryRestore.type='button';retryRestore.className='button secondary';retryRestore.hidden=true;
+retryRestore.textContent='Zkusit spojení znovu';
+document.querySelector('#form-status').after(retryRestore);
+retryRestore.addEventListener('click',restore);
+async function restore(){
+  if(!responseId||restoreBusy)return;
+  restoreBusy=true;
+  const button=document.querySelector('#submit'),status=document.querySelector('#form-status');
+  let failed=false;button.disabled=true;retryRestore.disabled=true;
+  status.textContent='Ověřujeme předchozí odpověď…';
+  try{
+    const result=await weddingApi.rpc('wedding_resume',{p_id:responseId});
+    status.textContent='';retryRestore.hidden=true;
+    if(!result.payload)return;
+    if(formTouched){status.textContent='Spojení funguje. Rozepsané údaje jsme ponechali ve formuláři. Odesláním aktualizujete svou předchozí odpověď.';return;}
+    const data=result.payload;
+    for(const key of ['attendance','contactName','email','phone','accommodation','transport','cars','rideHome','accessibility','song','message'])
+      if(form.elements[key])form.elements[key].value=data[key]??'';
+    guestList.replaceChildren();data.guests.forEach(addGuest);attendanceChanged();showSuccess(data);
+  }catch(error){
+    failed=true;retryRestore.hidden=false;
+    status.textContent='Předchozí odpověď se nepodařilo ověřit. Klikněte na „Zkusit spojení znovu“. Rozepsané údaje zůstávají ve formuláři.';
+  }finally{button.disabled=failed;retryRestore.disabled=false;restoreBusy=false;}
+}
 attendanceChanged();restore();
 function updateCountdown(){const today=new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Prague',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());const left=Math.max(0,Math.ceil((Date.UTC(2027,5,26)-Date.parse(today+'T00:00:00Z'))/86400000));document.querySelector('#days').textContent=left;document.querySelector('#days-label').textContent=left===0?'Náš svatební den':left===1?'den do našeho ano':left<5?'dny do našeho ano':'dní do našeho ano';}updateCountdown();
 document.querySelector('#calendar').addEventListener('click',()=>{const text=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//DoukySvatba//CS','BEGIN:VEVENT','UID:jiri-katerina-20270626@doukysvatba.github.io','DTSTAMP:'+new Date().toISOString().replace(/[-:]/g,'').replace(/\.\d{3}/,''),'DTSTART;VALUE=DATE:20270626','DTEND;VALUE=DATE:20270627','SUMMARY:Svatba Jiřího a Kateřiny','DESCRIPTION:Svatba v přírodě u rybníka. Přesné místo a časy doplníme.','URL:https://doukysvatba.github.io/','END:VEVENT','END:VCALENDAR',''].join('\r\n');const url=URL.createObjectURL(new Blob([text],{type:'text/calendar;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download='jiri-a-katerina-26-6-2027.ics';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);});

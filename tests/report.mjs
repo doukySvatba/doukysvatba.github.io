@@ -12,7 +12,7 @@ export async function run(){
   assert.equal(summary.songs.length,1);assert.equal(summary.meals.vegetarian,1);
   const output=r.exportRows(rows);assert.equal(output.length,3);assert.equal(output[2].ucast,'Ne');assert.equal(output[0].alergie,'Ořechy');
   const csv=r.csv(output);assert.ok(csv.startsWith('\ufeff'));assert.ok(csv.includes("'=malicious"));assert.ok(csv.includes('pocet_aut_za_skupinu'));
-  const calls=[];const transport={WEDDING_CONFIG:{url:'https://example.supabase.co',key:'sb_publishable_test'},fetch:async(url,options)=>{calls.push({url,options});return{ok:true,status:200,json:async()=>({saved:true})};}};transport.window=transport;vm.createContext(transport);vm.runInContext(await readFile(new URL('../api.js',import.meta.url),'utf8'),transport);
+  const calls=[];const transport={AbortController,setTimeout,clearTimeout,WEDDING_CONFIG:{url:'https://example.supabase.co',key:'sb_publishable_test'},fetch:async(url,options)=>{calls.push({url,options});return{ok:true,status:200,json:async()=>({saved:true})};}};transport.window=transport;vm.createContext(transport);vm.runInContext(await readFile(new URL('../api.js',import.meta.url),'utf8'),transport);
   assert.equal((await transport.weddingApi.rpc('wedding_submit',{p_id:'id',p_payload:payload})).saved,true);
   assert.equal(calls[0].options.headers.apikey,'sb_publishable_test');assert.equal(JSON.parse(calls[0].options.body).p_payload.guests.length,2);
   transport.fetch=async()=>({ok:false,status:403,json:async()=>({})});await assert.rejects(transport.weddingApi.rpc('wedding_admin_list'),e=>e.status===403);
