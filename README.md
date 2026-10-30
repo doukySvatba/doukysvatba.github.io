@@ -35,3 +35,7 @@ GitHub Actions používá pouze veřejné proměnné `SUPABASE_URL` a `SUPABASE_
 Správcovská relace vyprší po čtyřech hodinách. Veřejnost nemá přímý přístup k tabulkám, SQL funkce kontrolují formulář a přístupové tokeny. Každá rodina/skupina má náhodný identifikátor pro úpravy odpovědi. Změna zařízení nebo vymazání dat prohlížeče tuto vazbu ztratí — změnu pak řeší organizátor.
 
 Volby noclehu a odvozu zjišťují zájem, nejsou rezervací. Ilustrace a návrh programu jsou pracovní, časy ani konkrétní místo nebyly vymyšleny jako potvrzený fakt.
+
+## Photo and story slots
+
+Five placeholders in index.html: jiri, katerina (portraits), spolecna, vylety, spolecna-siroka. Locate using data-photo-slot. Story copy lives in #nas-pribeh. Replace placeholders with supplied photos and meaningful alt text. Images should retain full proportions (width:100%; height:auto), without forced cropping. Once photos arrive, add only approved public assets to the build.py allowlist; never copy private source folders wholesale.

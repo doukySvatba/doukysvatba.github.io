@@ -5,3 +5,25 @@
 
 /* Photo interludes: replace each .photo-space with a real img when supplied. */
 .photo-story{display:grid;grid-template-columns:.85fr 1fr 1.15fr;gap:35px;align-items:center;padding-top:0;padding-bottom:85px}.photo-story-copy h2{font-size:43px}.photo-story-copy .muted{max-width:230px}.photo-frame{margin:0;background:var(--white);padding:13px 13px 0;box-shadow:0 7px 25px #263e3210;border:1px solid #e5e4d9}.photo-frame figcaption{padding:17px 5px 19px;text-align:center;font:italic 18px var(--serif);color:var(--muted)}.photo-space{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;text-align:center;padding:24px;background:linear-gradient(145deg,#dce3d3,#edf0e5);outline:1px dashed #a9b89c;outline-offset:-12px;color:#536b50}.photo-space>span:not(.photo-mark){font-size:12px}.photo-space small{font-size:10px;color:var(--muted)}.photo-mark{font:45px var(--serif);color:#899771}.photo-portrait{transform:rotate(-3deg)}.photo-portrait .photo-space{aspect-ratio:3/4}.photo-landscape{transform:rotate(3deg);margin-top:60px}.photo-landscape .photo-space{aspect-ratio:4/3;background:linear-gradient(145deg,#e8e5d6,#e1e7d8)}.photo-frame img{display:block;width:100%;height:auto}.photo-pause{padding-top:0;padding-bottom:80px}.photo-wide{max-width:980px;margin:auto}.photo-wide .photo-space{aspect-ratio:3/1;background:linear-gradient(110deg,#e5e8d8,#ccd9c8,#e9edde)}.photo-wide figcaption{font-size:22px;padding:21px}.photo-wide .photo-mark{font-size:48px}@media(max-width:900px){.photo-story{grid-template-columns:1fr 1fr;gap:30px}.photo-story-copy{grid-column:1/-1;text-align:center}.photo-story-copy h2 br{display:none}.photo-story-copy .muted{max-width:none}.photo-portrait{max-width:300px;justify-self:end}.photo-landscape{max-width:360px}.photo-wide .photo-space{aspect-ratio:2.5/1}}@media(max-width:620px){.photo-story{gap:16px;padding-top:0;padding-bottom:55px}.photo-story-copy h2{font-size:34px}.photo-story-copy{margin-bottom:6px}.photo-frame{padding:8px 8px 0}.photo-frame figcaption{font-size:13px;padding:12px 2px}.photo-space{padding:19px 12px;outline-offset:-7px;gap:6px}.photo-space>span:not(.photo-mark){font-size:10px}.photo-space small{font-size:8px}.photo-mark{font-size:29px}.photo-landscape{margin-top:30px}.photo-pause{padding-top:0;padding-bottom:48px}.photo-wide .photo-space{aspect-ratio:1.6/1}.photo-wide figcaption{font-size:17px;padding:16px 9px}}
+
+/* Couple portraits and editable story copy; photos keep their full proportions. */
+.about-us{border-top:1px solid var(--line)}
+.about-heading{max-width:700px;margin:0 auto 40px;text-align:center}
+.about-heading>.muted{max-width:530px;margin:0 auto}
+.about-couple{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:32px}
+.about-person{min-width:0;background:var(--white);border:1px solid var(--line);padding:24px;border-radius:5px}
+.about-portrait{margin:0 0 25px}
+.about-portrait .photo-space{aspect-ratio:4/3;border-radius:45% 45% 2px 2px}
+.about-portrait img{display:block;width:100%;height:auto;border-radius:3px}
+.about-person-copy .eyebrow{margin-bottom:12px}
+.about-person-copy h3{font-size:clamp(27px,3vw,38px);overflow-wrap:anywhere}
+.about-person-copy h3 em{display:block;color:var(--green)}
+.about-person-copy p:last-child{margin-bottom:0}
+.about-placeholder{color:var(--muted);font-size:14px}
+.about-memories{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:30px;margin-top:38px}
+.about-memories article{border-top:1px solid var(--line);padding-top:22px;min-width:0}
+.about-memories .eyebrow{display:block;margin-bottom:14px;letter-spacing:1.5px}
+.about-memories h3{font-size:25px}
+.about-memories p{font-size:14px;margin-bottom:0}
+@media(max-width:900px){.about-couple{gap:22px}.about-memories{grid-template-columns:1fr;gap:24px}.about-heading{margin-bottom:30px}}
+@media(max-width:620px){.about-couple{grid-template-columns:1fr}.about-person{padding:20px}.about-portrait{margin-bottom:20px}.about-heading h2 br{display:none}.about-heading h2{font-size:35px}.about-heading>.muted{font-size:14px}.about-person-copy h3{font-size:31px}.about-person-copy p{font-size:14px}}
