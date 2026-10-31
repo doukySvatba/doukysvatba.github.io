@@ -35,6 +35,11 @@ def build():
     for name in ('index.html','style.css','api.js','app.js','admin.html','admin.css','admin.js','report.js'):
         shutil.copyfile(ROOT/name,destination/name)
     if (ROOT/'og.png').exists(): shutil.copyfile(ROOT/'og.png',destination/'og.png')
+    # Only these approved public sample photos are included in deployment.
+    story_assets = ('spolecne-mladi','katerina-1','katerina-2','katerina-3','jiri-1','jiri-2','jiri-3','znovu-spolu')
+    (destination/'assets'/'story').mkdir(parents=True)
+    for name in story_assets:
+        shutil.copyfile(ROOT/'assets'/'story'/f'{name}.jpg', destination/'assets'/'story'/f'{name}.jpg')
     (destination/'config.js').write_text('window.WEDDING_CONFIG = '+json.dumps(public_config)+';\n',encoding='utf-8')
     (destination/'.nojekyll').touch()
     print('Built public Pages files. No private configuration included.')
